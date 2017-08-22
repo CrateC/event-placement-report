@@ -3,7 +3,7 @@ import datetime
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import connection
 from django.views.generic import ListView
-from utils.query_to_dict import convert_query_to_dict
+from utils.query_to_dict import convert_query_to_dict, convert_sqlite_query_to_dict
 
 from .models import Event
 
@@ -33,7 +33,7 @@ class EventsPlacementListView(LoginRequiredMixin, ListView):
         for tbl_name_ in tbl_names:
             cursor.execute(
                 f"""
-                    SELECT id FROM event_placement_dev.events_platforms
+                    SELECT id FROM events_platforms
                     WHERE short_name='{tbl_name_.upper()}';
             """)
             pl_id = cursor.fetchone()[0]
@@ -43,39 +43,41 @@ class EventsPlacementListView(LoginRequiredMixin, ListView):
 
             cursor.execute(
                 f"""
-                    DROP TABLE IF EXISTS {tbl_name_};
+                    DROP TABLE IF EXISTS {tbl_name_.upper()}
             """)
             cursor.execute(
                 f"""
-                    CREATE TEMPORARY TABLE IF NOT EXISTS {tbl_name_} AS (
-                        SELECT name,(link) as {tbl_name_.upper()}, date
-                        FROM event_placement_dev.events_events
-                        WHERE platform_id = '{pl_id}' AND language = 'ru'
-                        GROUP BY date ORDER BY date
-                    );
+
+                    CREATE TEMP TABLE IF NOT EXISTS {tbl_name_.upper()} AS SELECT name,(link) as {tbl_name_.upper()}, date
+                    FROM events_events
+                    WHERE platform_id = (SELECT id FROM events_platforms
+                    WHERE short_name='{tbl_name_.upper()}') AND language = 'ru'
+                                        GROUP BY date order by date
             """)
             columns.append(f'{tbl_name_.upper()}')
 
         cursor.execute(
-            f"""
-                SELECT
-                t1.date,t1.name,t1.CA,
-                t2.PA,
-                t3.KA,
-                t4.CO
+        f"""
+            SELECT
+            t1.name, t1.date, t1.CA,
+            t2.PA,
+            t3.KA,
+            t4.CO
 
-                FROM ca AS t1
+            FROM temp.CA AS t1
 
-                    LEFT JOIN pa AS t2 ON t1.date = t2.date
+            LEFT JOIN temp.PA AS t2 ON t1.date = t2.date
 
-                    LEFT JOIN ka AS t3 ON t1.date = t3.date
+            LEFT JOIN temp.KA AS t3 ON t1.date = t3.date
 
-                    LEFT JOIN co AS t4 ON t1.date = t4.date
+            LEFT JOIN temp.CO AS t4 ON t1.date = t4.date
 
-                WHERE t1.date > CURDATE()
-                ORDER BY date
-            """)
+            WHERE t1.date > datetime('NOW')
+            ORDER BY t1.date;
+        """)
 
         events_data = cursor.fetchall()
         cursor.close()
-        return convert_query_to_dict(f"""{events_data}""")
+        print(events_data)
+        return convert_sqlite_query_to_dict(f"""{events_data}""")
+        # return convert_query_to_dict(f"""{events_data}""")
