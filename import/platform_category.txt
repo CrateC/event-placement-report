@@ -1,0 +1,3 @@
+PL:Place
+TS:Ticket Seller
+MP:Media Partner

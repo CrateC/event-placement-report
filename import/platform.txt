@@ -1,0 +1,5 @@
+name,link,category
+Caribbean Club,http://caribbean.com.ua,PL
+Parter.ua,http://parter.ua/ru/event/concert-hall/caribbean_club.html,TS
+Karabas.com,https://karabas.com/caribbean-club/,TS
+Concert.ua,https://www.concert.ua/kiev/caribbean-club,TS

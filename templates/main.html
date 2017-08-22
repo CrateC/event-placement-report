@@ -1,0 +1,19 @@
+
+
+{% block head_title %}Events Merged | {{ block.super }}{% endblock head_title %}
+
+
+{% load i18n admin_urls admin_static %}
+{% block content %}
+<h1>Events Placement </h1>
+
+{% if request.user.is_authenticated %}
+
+
+{% include 'events/export.html' %}
+
+{% endif %}
+
+
+
+{% endblock %}
