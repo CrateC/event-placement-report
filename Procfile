@@ -1,1 +1,1 @@
-web: gunicorn event_placement.wsgi --log-file -
+gunicorn --bind 0.0.0.0:8000 wsgi:application --log-file -
