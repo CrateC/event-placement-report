@@ -25,8 +25,7 @@ SECRET_KEY = 'i5d76re$0z49#v(6n!)ezqy4$zfg2v@+ubx0d2tjhasix(dvhl'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = TEMPLATE_DEBUG = False  # production
 
-ALLOWED_HOSTS = ['localhost',
-                 '127.0.0.1',]
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -139,6 +138,9 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, 'static'),
 )
+
+MEDIA_ROOT = 'media'
+MEDIA_URL = '/media'
 # Extra places for collectstatic to find static files.
 # STATICFILES_DIRS = (
 #     os.path.join(BASE_DIR, 'static'),
