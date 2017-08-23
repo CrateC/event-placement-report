@@ -31,7 +31,7 @@ flake8/
 *.sql
 import/import.py
 event_placement/settings/path_test.py
-spiders/data/*.txt
+spiders/data/*_events.txt
 select_out.txt
 
 
