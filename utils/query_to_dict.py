@@ -50,6 +50,7 @@ def convert_sqlite_query_to_dict(query):
                     .replace("[", "")
                     .replace("]", "")
                     .replace("'", "")
+                    .replace("None)", "None")
            )
     # print(len(query_a))
     ev_list = query.split(';')
