@@ -2,7 +2,8 @@ import requests
 from DateTimeProcess import datetime_process
 from bs4 import BeautifulSoup
 from import_db import ImportDb
-
+import sys
+sys.setdefaultencoding(‘utf-8’)
 
 class Parter:
     url_get = 'http://parter.ua/en/event/concert-hall/caribbean_club.html'

@@ -10,7 +10,8 @@ from import_db import ImportDb
 
 def make_dict():
     return defaultdict(make_dict)
-
+import sys
+sys.setdefaultencoding(‘utf-8’)
 
 class Caribbean:
     dd = defaultdict(make_dict)

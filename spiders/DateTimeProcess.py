@@ -2,7 +2,8 @@ from datetime import datetime
 
 import pendulum
 from custom_date_to_number import date_to_number
-
+import sys
+sys.setdefaultencoding(‘utf-8’)
 
 def datetime_process(dd):
     dd_type = type(dd)

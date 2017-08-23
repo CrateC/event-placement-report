@@ -10,7 +10,8 @@ from import_db import ImportDb
 
 def make_dict():
     return defaultdict(make_dict)
-
+import sys
+sys.setdefaultencoding(‘utf-8’)
 
 class Concert:
     cut_time_regex = ':00\+\d{2}:00|T'
