@@ -7,7 +7,7 @@ from import_db import ImportDb
 class Parter:
     url_get = 'http://parter.ua/en/event/concert-hall/caribbean_club.html'
     p_name = 'PA'
-    out_path = f'data\\{p_name}_events.txt'
+    out_path = f'data/{p_name}_events.txt'
     lang = 'ru'
 
     fields = {

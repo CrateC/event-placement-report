@@ -27,7 +27,7 @@ class ImportDb:
         }
 
     def import_to_db(self):
-        place_code = re.search(r'[^\\]+(?=_events)', self.path).group()
+        place_code = re.search(r'[^\/|\\]+(?=_events)', self.path).group()
         platform_name = self.PLATFORM_NAMES[place_code]
         print(platform_name)
         # pass

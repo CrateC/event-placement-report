@@ -24,7 +24,7 @@ class Karabas:
 
 
     p_name = 'KA'
-    out_path = f'data\\{p_name}_events.txt'
+    out_path = f'data/{p_name}_events.txt'
 
 
 
