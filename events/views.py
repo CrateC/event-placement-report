@@ -59,7 +59,7 @@ class EventsPlacementListView(LoginRequiredMixin, ListView):
         cursor.execute(
         f"""
             SELECT
-            t1.name, t1.date, t1.CA,
+            t1.date, t1.name, t1.CA,
             t2.PA,
             t3.KA,
             t4.CO
