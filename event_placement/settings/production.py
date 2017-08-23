@@ -160,7 +160,7 @@ STATIC_ROOT = os.path.join(PROJECT_PATH, 'staticfiles')
 # STATIC_ROOT = 'C:/Python/Training/django-core/django-events-placement/src/static/'
 STATIC_URL = '/static/'
 STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(PROJECT_ROOT, 'static'),
 )
 
 MEDIA_ROOT = 'media'
