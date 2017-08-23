@@ -27,7 +27,7 @@ class Concert:
             }
 
     p_name = 'CO'
-    out_path = f'data\\{p_name}_events.txt'
+    out_path = f'data/{p_name}_events.txt'
     lang = 'ru'
 
     fields = {
