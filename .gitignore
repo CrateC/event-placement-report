@@ -62,7 +62,6 @@ coverage.xml
 *.pot
 
 # Django stuff:
-/static
 *.log
 event_placement/settings/local.py
 event_placement/settings/base.py
