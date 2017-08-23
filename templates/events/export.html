@@ -46,17 +46,17 @@
 
             <th class="col-xs-3" data-toggle="tooltip" data-placement="top"
                 title="
-                {% if key == 'CA' %}
+                {% if key == 'ca' %}
                 caribbean.com.ua
-                {% elif key == 'PA' %}
+                {% elif key == 'pa' %}
                 parter.com.ua
-                {% elif key == 'CO' %}
+                {% elif key == 'co' %}
                 concert.ua
-                {% elif key == 'KA' %}
+                {% elif key == 'ka' %}
                 karabas.ua
                 {% endif %}">
                 <div class="th-inner">
-                    {{ key }}
+                    {{ key|upper }}
                 </div>
 
             </th>
