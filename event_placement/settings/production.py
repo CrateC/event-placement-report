@@ -35,6 +35,7 @@ MEDIA_URL = '/media/'
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    # 'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
 
@@ -48,7 +49,7 @@ STATICFILES_FINDERS = (
 SECRET_KEY = 'i5d76re$0z49#v(6n!)ezqy4$zfg2v@+ubx0d2tjhasix(dvhl'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = TEMPLATE_DEBUG = False  # production
+DEBUG = TEMPLATE_DEBUG = True  # production
 
 ALLOWED_HOSTS = ['*']
 

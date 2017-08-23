@@ -78,6 +78,6 @@ class EventsPlacementListView(LoginRequiredMixin, ListView):
 
         events_data = cursor.fetchall()
         cursor.close()
-        print(events_data)
+        # print(events_data)
         return convert_sqlite_query_to_dict(f"""{events_data}""")
         # return convert_query_to_dict(f"""{events_data}""")
