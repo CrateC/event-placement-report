@@ -44,19 +44,19 @@
             </th>
             {% for k, v in object_list.items %} {% if forloop.first %} {% for key in v %} {% if key|length == 2 %}
 
-            <th class="col-xs-3" data-toggle="tooltip" data-placement="top"
+            <th class="links" data-toggle="tooltip" data-placement="top"
                 title="
-                {% if key == 'CA' %}
+                {% if key == 'ca' %}
                 caribbean.com.ua
-                {% elif key == 'PA' %}
+                {% elif key == 'pa' %}
                 parter.com.ua
-                {% elif key == 'CO' %}
+                {% elif key == 'co' %}
                 concert.ua
-                {% elif key == 'KA' %}
+                {% elif key == 'ka' %}
                 karabas.ua
                 {% endif %}">
                 <div class="th-inner">
-                    {{ key }}
+                    {{ key|upper }}
                 </div>
 
             </th>
@@ -98,7 +98,7 @@
             {% endif %} {% elif key|length == 2 %}
             {% if val not in 'None' %}
 
-            <td class="table-success col-xs-1">
+            <td class="links table-success">
                 <p>
                     <a href="{{ val }}" class="btn-full">
                         <!-- <div style="height:100%;width:100%"> -->

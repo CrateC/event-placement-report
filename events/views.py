@@ -27,7 +27,7 @@ class EventsPlacementListView(LoginRequiredMixin, ListView):
 
         cursor = connection.cursor()
         columns = ['date', 'name']
-        tbl_names = ['ca', 'pa', 'co', 'ka']
+        tbl_names = ['ca', 'pa', 'ka', 'co']
         dc = {}
 
         for tbl_name_ in tbl_names:
@@ -59,10 +59,10 @@ class EventsPlacementListView(LoginRequiredMixin, ListView):
         cursor.execute(
         f"""
             SELECT
-            t1.name, t1.date, t1.CA,
+            t1.date, t1.name, t1.CA,
             t2.PA,
-            t3.KA,
-            t4.CO
+            t4.CO,
+            t3.KA
 
             FROM temp.CA AS t1
 
