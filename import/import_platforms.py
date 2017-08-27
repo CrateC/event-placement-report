@@ -10,7 +10,7 @@ django.setup()
 
 from events.models import Platform
 
-import_path = r'.\platform.txt'
+import_path = r'platform.txt'
 
 # PLATFORM_NAMES = {
 #         'CA': 'Caribbean Club',
