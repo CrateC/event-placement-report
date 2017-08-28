@@ -5,14 +5,13 @@ from custom_date_to_number import date_to_number
 
 def datetime_process(dd):
     dd_type = type(dd)
-    # print(f"dd_type: {dd_type}")
     if dd_type is str:
         # print("type: str")
         return data_parse(dd)
     elif dd_type is 'dict':
         pass
 
-    print(f"===============================================")
+    print("===============================================")
     print("")
 
     dl = ['month', 'day', 'time_start']
@@ -27,22 +26,22 @@ def datetime_process(dd):
         dt_string = date_time_to_var(dd)
     except Exception as e:
         print(
-            f"""//////Exception
-                month_to_number: {e}
-                input (dt_string): {dt_string}
-            """)
+            """//////Exception
+                month_to_number: {}
+                input (dt_string): {}
+            """.format(e, dt_string))
     finally:
         dd['date'] = str(data_parse(dt_string))
         print(
-            f"""
-                input (dd): {dd}
-                result (dd['date']): {dd['date']}
-            """)
+            """
+                input (dd): {}
+                result (dd['date']): {}
+            """.format(dd, dd['date']))
 
     return {k: v for k, v in dd.items() if k not in ['month',
                                                      'day',
-                                                     'time_start'
-                                                    ]}
+                                                     'time_start']
+    }
 
 def data_parse(dt):
 
@@ -73,14 +72,14 @@ def data_parse(dt):
             if i == len(dt_formats)-1:
                 print(i)
                 print(
-                    f"""//////Exception
-                        dt_format: {dt_format}
-                        input (dt): {dt}
-                        """)
+                    """//////Exception
+                        dt_format: {}
+                        input (dt): {}
+                    """.format(dt_format, dt))
 
 def month_to_number(month):
     return date_to_number(month.lower())
 
 def date_time_to_var(dd):
     year = datetime.today().year
-    return f'{dd["month"]} {dd["day"]} {year} {dd["time_start"]}'
+    return '{} {} {} {}'.format(dd["month"], dd["day"], year, dd["time_start"])

@@ -13,11 +13,17 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import os
 
 
+ALLOWED_HOSTS = ['127.0.0.1', '103.250.83.254']
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         # BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 # BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# sys.path.append(BASE_DIR)
+# os.environ['DJANGO_SETTINGS_MODULE'] = 'event_placement.settings.base'
+
 
 STATIC_ROOT = os.path.normpath(os.path.join(BASE_DIR, 'staticfiles'))
 STATICFILES_DIRS = (
@@ -39,8 +45,16 @@ STATICFILES_FINDERS = (
 )
 
 
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False
 
 
+
+# CSRF_COOKIE_SECURE = True
+# SESSION_COOKIE_SECURE = True
+# SECURE_CONTENT_TYPE_NOSNIFF = True
+# SECURE_BROWSER_XSS_FILTER = True
+# SECURE_SSL_REDIRECT = True
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
@@ -48,10 +62,6 @@ STATICFILES_FINDERS = (
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'i5d76re$0z49#v(6n!)ezqy4$zfg2v@+ubx0d2tjhasix(dvhl'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = TEMPLATE_DEBUG = True  # production
-
-ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -111,7 +121,6 @@ TEMPLATES = [
     },
 ]
 
-
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 WSGI_APPLICATION = 'event_placement.wsgi.application'
@@ -163,7 +172,34 @@ USE_L10N = True
 
 USE_TZ = False
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse'
+        }
+    },
 
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler'
+        },
+     'console':{
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    }
+}
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 

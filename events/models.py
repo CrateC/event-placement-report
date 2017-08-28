@@ -25,7 +25,7 @@ class Platform(models.Model):
 
     @property
     def title(self):
-        return f'{self.short_name} | {self.name}'
+        return '{} | {}'.format(self.short_name, self.name)
 
     class Meta:
         db_table = 'events_platforms'

@@ -25,8 +25,9 @@ class Concert:
                 'Accept-Language': 'en-US,en;q=0.8',
             }
 
+
     p_name = 'CO'
-    out_path = f'data/{p_name}_events.txt'
+    out_path = 'data/%s_events.txt' % p_name
     lang = 'ru'
 
     fields = {
@@ -58,13 +59,13 @@ class Concert:
             for key, val in self.fields.items():
 
                 if val is 'date':
-                    self.dd[f'{self.lang}'][f'{i}'][val] = (
+                    self.dd['%s' % self.lang]['%d' % i][val] = (
                         re.sub(
                                 self.cut_time_regex, ' ', d[key]
                                 ).strip()
                     )
                 else:
-                    self.dd[f'{self.lang}'][f'{i}'][val] = d[key]
+                    self.dd['%s' % self.lang]['%d' % i][val] = d[key]
 
         with open(self.out_path, 'w') as file:
             json.dump(self.dd, file)
@@ -72,6 +73,3 @@ class Concert:
         # From File to Database
         import_ = ImportDb(self.out_path)
         import_.import_to_db()
-
-concert = Concert()
-concert.not_async()

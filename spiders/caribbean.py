@@ -18,12 +18,11 @@ class Caribbean:
 
     for lang in LANG_LIST:
         urls.append(
-            f'http://caribbean.com.ua/{lang}/'
-            '?s=&cat=73%2C67&start_day=now'
+            'http://caribbean.com.ua/{0}/?s=&cat=73%2C67&start_day=now'.format(lang)
         )
 
     p_name = 'CA'
-    out_path = f'data/{p_name}_events.txt'
+    out_path = 'data/%s_events.txt' % p_name
 
     fields = {
         'name': 'div.b-title > a',
@@ -54,7 +53,7 @@ class Caribbean:
                 link = event_.select("div.b-title > a")[0].get('href')
                 cur_lenght = re.search(r'(?<=/)[a-z]{2}(?=/)', link).group()
 
-                print(f"cur_lenght_0: {cur_lenght}")
+                print("cur_lenght_0: %s" % cur_lenght)
                 self.dd[cur_lenght][self.i]['link'] = link
 
                 for key, val in self.fields.items():
@@ -75,7 +74,3 @@ class Caribbean:
             # Importing to Database
             import_ = ImportDb(self.out_path)
             import_.import_to_db()
-
-
-caribbean = Caribbean()
-caribbean.async()

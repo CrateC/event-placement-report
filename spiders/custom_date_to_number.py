@@ -35,5 +35,5 @@ def date_to_number(key):
             'дек': '12',
         },
     }
-    print(f'date_to_number result: {key}')
+    print('date_to_number result: {}'.format(key))
     return trans['months_abbrev'][key.lower()]
