@@ -35,7 +35,7 @@ def convert_query_to_dict(query):
         item_ = [x.strip() for x in item_l_.split(',')]
 
         if len(item_) == len(columns):
-            dictionary['%d' % i] = dict(zip(columns, item_))
+            dictionary['%s' % i] = dict(zip(columns, item_))
         else:
             print(item_l)
             break
@@ -58,13 +58,13 @@ def convert_sqlite_query_to_dict(query):
     columns = ['date', 'name', 'ca', 'pa', 'co', 'ka']
     dictionary = {}
     for i, items in enumerate(list(ev_list)):
-    #     print(items)
+        print(items)
 
         items_ = items.split(', ')
         if len(items_) == len(columns):
-            dictionary['%d' % i]  = dict(zip(columns, items_))
+            dictionary['%s' % i]  = dict(zip(columns, items_))
         else:
-            print(item_l)
+            print(items)
             break
 
     return dictionary

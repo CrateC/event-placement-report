@@ -1,24 +1,29 @@
-from import_platforms import ImportPlaces
-ImportPlaces('db_import/platform.txt')
+try:
+    from caribbean import Caribbean
+    caribbean = Caribbean()
+    caribbean.async()
+except:
+    pass
 
+try:
+    from parter import Parter
+    parter = Parter()
+    parter.not_async()
+except:
+    pass
 
-from caribbean import Caribbean
-caribbean = Caribbean()
-caribbean.async()
+try:
+    from concert import Concert
+    concert = Concert()
+    concert.not_async()
+except:
+    pass
 
-from parter import Parter
-parter = Parter()
-parter.not_async()
-
-from concert import Concert
-concert = Concert()
-concert.not_async()
-
-
-from karabas import Karabas
-karabas = Karabas()
-karabas.async()
-
-
+try:
+    from karabas import Karabas
+    karabas = Karabas()
+    karabas.async()
+except:
+    pass
 # import_ = ImportDb("CA_events.txt")
 # import_.import_to_db()
