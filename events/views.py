@@ -150,4 +150,4 @@ class EventsPlacementListView(LoginRequiredMixin, ListView):
             events_data = cursor.fetchall()
             print(type(events_data))
             cursor.close()
-                return convert_query_to_dict("""{}""".format(events_data,))
+            return convert_query_to_dict("""{}""".format(events_data,))
