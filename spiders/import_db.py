@@ -6,7 +6,7 @@ import sys
 
 project_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_dir)
-os.environ['DJANGO_SETTINGS_MODULE'] = 'event_placement.settings.base'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'event_placement.settings.production'
 import django
 django.setup()
 from events.models import Event, Platform

@@ -3,6 +3,7 @@ import re
 
 
 def convert_query_to_dict(query):
+    #print(query)
     with open('select_out.txt', 'w', encoding='utf-8') as file:
         file.write(str(query))
 
