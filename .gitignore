@@ -29,7 +29,6 @@ flake8/
 *.7z
 *.csv
 *.sql
-import/import.py
 event_placement/settings/path_test.py
 spiders/data/*_events.txt
 select_out.txt
@@ -67,7 +66,9 @@ event_placement/settings/local.py
 event_placement/settings/base.py
 event_placement/old_settings.py
 *.sqlite3 
-
+staticfiles
+static/admin
+static/staticfiles.json
 
 # PyCharm
 .idea
