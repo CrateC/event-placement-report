@@ -1,4 +1,5 @@
-#from .base import *
+# Importing Settings file
+# from .base import *
 
 from .production import *
 

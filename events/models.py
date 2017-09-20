@@ -1,18 +1,16 @@
 from django.db import models
+from django_mysql.models import Model
 
 
 class Platform(models.Model):
 
-    PLATFORM_NAMES = (
-        ('CA', 'Caribbean Club'),
-        ('KA', 'Karabas.com'),
-        ('CO', 'Concert.ua'),
-    )
     CATEGORY_NAMES = (
             ('PL', 'Place'),
             ('TS', 'Ticket Seller'),
+            ('FB', 'Facebook Event'),
             ('MP', 'Media Partner'),
     )
+
     name = models.CharField(max_length=120, null=True, blank=True)
     short_name = models.CharField(max_length=2, null=True, blank=True)
     link = models.CharField(max_length=120, null=True, blank=True)
@@ -30,9 +28,11 @@ class Platform(models.Model):
     class Meta:
         db_table = 'events_platforms'
         unique_together = ('name', 'category',)
+        verbose_name = 'events_platform'
+        verbose_name_plural = 'events_platforms'
 
 
-class Event(models.Model):
+class Event(Model):
     platform = models.ForeignKey(Platform, null=True, blank=True)
     name = models.CharField(max_length=120, null=True, blank=True)
     link = models.CharField(max_length=180, null=True, blank=True)
@@ -45,6 +45,8 @@ class Event(models.Model):
     class Meta:
         db_table = 'events_events'
         unique_together = ('platform', 'name', 'link', 'date',)
+        verbose_name = 'event'
+        verbose_name_plural = 'events'
         # unique_together = ("platform", "name", "link", "date")
 
     def __str__(self):
@@ -57,6 +59,7 @@ class Event(models.Model):
     @property
     def date_time_formatted(self):
         return self.date.strftime('%Y-%m-%d %H:%M')
+
 
 
 class EventHistory(models.Model):

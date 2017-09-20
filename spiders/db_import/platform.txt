@@ -2,4 +2,14 @@ name,link,category
 Caribbean Club,http://caribbean.com.ua,PL
 Parter.ua,http://parter.ua/ru/event/concert-hall/caribbean_club.html,TS
 Karabas.com,https://karabas.com/caribbean-club/,TS
-Concert.ua,https://www.concert.ua/kiev/caribbean-club,TS
+Concert.ua,https://concert.ua/kiev/caribbean-club,TS
+fb_CaribbeanClub,CaribbeanClub,FB
+fb_SalsaRulit,salsarules,FB
+fb_JazzTime,jazztimekiev,FB
+fb_CaribbeanConcertHall,caribbean.concerthall,FB
+nightlife.tochka.net,http://nightlife.tochka.net/clubs/id/107/afisha/,MP
+topclub.ua,https://topclub.ua/kiev/place-caribbean_club/afisha.html,MP
+today.kiev.ua,http://today.kiev.ua/Caribbean_Club/,MP
+gloss.ua,http://gloss.ua/place/Caribbean_Club,MP
+platfor.ma,http://platfor.ma/search/?search=caribbean+club,MP
+party.com.ua,http://party.com.ua/kiev/place/Caribbean_Club/afisha/,MP

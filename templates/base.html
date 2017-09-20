@@ -1,17 +1,33 @@
-<!DOCTYPE html>
-<html lang=en>
 
+<!DOCTYPE html>
+<html>
 <head>
-<title>{% block head_title %}Event Placement{% endblock head_title %}</title>
+<title>Events Placement</title>
+<meta charset="utf-8">
+
 {% include 'snippets/css.html' %}
 </head>
 <body>
+
 {% include 'snippets/nav.html' %}
 
-<div class='container'>
-{% block content %}{% endblock content %}
+<div id="container">
+    {% block content %}
+    {% endblock %}
 </div>
 
 {% include 'snippets/js.html' %}
+<script>
+    var $table = $('#table');
+    $(function () {
+        $('#toolbar').find('select').change(function () {
+            $table.bootstrapTable('destroy').bootstrapTable({
+                exportDataType: $(this).val()
+            });
+        });
+    })
+</script>
+
 </body>
+
 </html>

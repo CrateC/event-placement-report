@@ -1,27 +1,7 @@
+{% extends "base.html" %}
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Events Placement</title>
-    <meta charset="utf-8">
-
-
-{% include 'snippets/css.html' %}
-</head>
-
-<body>
-{% include 'snippets/nav.html' %}
-<div id="container">
-<div id="toolbar">
-    <select class="form-control">
-        <option value="">Export Basic</option>
-        <option value="all">Export All</option>
-        <option value="selected">Export Selected</option>
-    </select>
-</div>
-
-
-
+{% block content %}
+{% load platform_name from get_platform_name %}
 <table
     class="table table-hover table-fixed  table-condensed table-striped"
     id="table" data-toggle="table"
@@ -35,56 +15,45 @@
     data-icon-size="m"
     data-toolbar="#toolbar">
 
+
     <thead class="thead-default">
         <tr>
-            <th class="bs-checkbox col-xs-01"  data-field="state">
-                <div class="th-inner">
-                    <input name="btSelectAll" type="checkbox">
-                </div>
+            <th class="col-xs-01"  data-field="state">
+                #
             </th>
+
             {% for k, v in object_list.items %} {% if forloop.first %} {% for key in v %} {% if key|length == 2 %}
 
             <th class="links" data-toggle="tooltip" data-placement="top"
-                title="
-                {% if key == 'ca' %}
-                caribbean.com.ua
-                {% elif key == 'pa' %}
-                parter.com.ua
-                {% elif key == 'co' %}
-                concert.ua
-                {% elif key == 'ka' %}
-                karabas.ua
-                {% endif %}">
-                <div class="th-inner">
-                    {{ key|upper }}
-                </div>
+                title="{% platform_name key %}">
 
+                {{ key|upper }}
             </th>
 
             {% elif key == 'date' %}
             <th class="col-xs-2">
-                <div class="th-inner">
-                    {{ key|upper }}
-                </div>
+                {{ key|upper }}
             </th>
 
             {% else %}
             <th class="col-xs-3">
-                <div class="th-inner">
-                    {{ key|upper }}
-                </div>
+                {{ key|upper }}
             </th>
 
             {% endif %} {% endfor %} {% endif %} {% endfor %}
 
         </tr>
+
     </thead>
+
     <tbody>
-        {% for k, v in object_list.items %} {% if not forloop.first %}
+        {% for k, v in object_list.items %}
+
 
         <tr data-index="{{ forloop.counter }}">
-            <td class="bs-checkbox ">
-                <input data-index="{{ forloop.counter }}" name="btSelectItem" type="checkbox">
+            <td>
+                {{ forloop.counter }}
+
             </td>
             {% for key, val in v.items %} {% if key|length > 2 %}
             {% if key == 'date' %}
@@ -98,39 +67,18 @@
             {% endif %} {% elif key|length == 2 %}
             {% if val not in 'None' %}
 
-            <td class="links table-success">
-                <p>
-                    <a href="{{ val }}" class="btn-full">
-                        <!-- <div style="height:100%;width:100%"> -->
-                        &nbsp;{{ val }}
-                        <!-- </div> -->
-                    </a>
-                </p>
+            <td class="links table-success" data-tableexport-value="{{ val }}">
+
+                <span class="btn-full"><a href="{{ val }}">Yes</a>
+                </span>
+
             </td>
-            <!-- <a href="{{ val }}" ></a> -->
             {% else %}
-            <td data-field="no-url" class="table-danger">No</td>
+            <td data-field="no-url" class="links table-danger"><span class="btn-full">No</span></td>
             {% endif %} {% endif %} {% endfor %}
         </tr>
 
-        {% endif %} {% endfor %}
+        {% endfor %}
     </tbody>
 </table>
-
-</div>
-</div>
-{% include 'snippets/js.html' %}
-<script>
-    var $table = $('#table');
-    $(function () {
-        $('#toolbar').find('select').change(function () {
-            $table.bootstrapTable('destroy').bootstrapTable({
-                exportDataType: $(this).val()
-            });
-        });
-    })
-</script>
-
-</body>
-
-</html>
+{% endblock %}

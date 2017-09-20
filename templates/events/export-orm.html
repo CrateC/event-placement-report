@@ -1,0 +1,22 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Events Placement</title>
+    <meta charset="utf-8">
+
+
+{% include 'snippets/css.html' %}
+</head>
+
+<body>
+<p></p>
+<p>Objects list:</p>
+{{ object_list }}
+{% for item in object_list %}
+{{ item }}<br/>
+{% endfor %}
+
+</body>
+
+</html>

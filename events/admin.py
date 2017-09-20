@@ -8,6 +8,7 @@ admin.site.register(Platform)
 
 class EventsAdmin(admin.ModelAdmin):
     list_display = ('platform', 'name', 'language', 'date')
-admin.site.register(Event, EventsAdmin)
 
+
+admin.site.register(Event, EventsAdmin)
 admin.site.register(EventHistory, EventsAdmin)

@@ -1,7 +1,16 @@
 from datetime import datetime
 
 import pendulum
-from custom_date_to_number import date_to_number
+
+try:
+    # from os import path
+    # pr_path = path.dirname( path.dirname( path.abspath(__file__) ) )
+    # #print(pr_path)
+    # sys.path.append(pr_path)
+    from custom_date_to_number import date_to_number
+except:
+    from .custom_date_to_number import date_to_number
+
 
 def datetime_process(dd):
     dd_type = type(dd)
@@ -11,8 +20,8 @@ def datetime_process(dd):
     elif dd_type is 'dict':
         pass
 
-    print("===============================================")
-    print("")
+    #print("===============================================")
+    #print("")
 
     dl = ['month', 'day', 'time_start']
 
@@ -20,7 +29,7 @@ def datetime_process(dd):
         dd['month'] = date_to_number(dd['month'].lower())
     except Exception as e:
         dt_string = dd
-        print("//////Exception")
+        # print("//////Exception")
 
     try:
         dt_string = date_time_to_var(dd)
@@ -32,11 +41,11 @@ def datetime_process(dd):
             """.format(e, dt_string))
     finally:
         dd['date'] = str(data_parse(dt_string))
-        print(
-            """
-                input (dd): {}
-                result (dd['date']): {}
-            """.format(dd, dd['date']))
+        # print(
+        #     """
+        #         input (dd): {}
+        #         result (dd['date']): {}
+        #     """.format(dd, dd['date']))
 
     return {k: v for k, v in dd.items() if k not in ['month',
                                                      'day',
@@ -77,9 +86,23 @@ def data_parse(dt):
                         input (dt): {}
                     """.format(dt_format, dt))
 
+
 def month_to_number(month):
     return date_to_number(month.lower())
 
 def date_time_to_var(dd):
     year = datetime.today().year
     return '{} {} {} {}'.format(dd["month"], dd["day"], year, dd["time_start"])
+
+
+# if __name__ == '__main__':
+#     if __package__ is None:
+#         import sys
+#         from os import path
+#         pr_path = path.dirname(path.dirname( path.abspath(__file__) ) )
+#         print(pr_path)
+#         sys.path.append(pr_path)
+#
+#         from custom_date_to_number import date_to_number
+#     else:
+#         from ..custom_date_to_number import date_to_number

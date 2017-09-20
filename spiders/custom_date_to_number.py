@@ -35,5 +35,9 @@ def date_to_number(key):
             'дек': '12',
         },
     }
-    print('date_to_number result: {}'.format(key))
+    #print('date_to_number result: {}'.format(key))
     return trans['months_abbrev'][key.lower()]
+
+if __name__ == '__main__' and __package__ is None:
+    from os import sys, path
+    sys.path.append(path.dirname(path.dirname(path.abspath(__file__))))

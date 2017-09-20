@@ -8,12 +8,14 @@ https://docs.djangoproject.com/en/1.11/topics/settings/
 
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.11/ref/settings/
+
+
 """
 
 import os
 
 
-ALLOWED_HOSTS = ['127.0.0.1', '103.250.83.254']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '103.250.83.254']
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -46,7 +48,7 @@ STATICFILES_FINDERS = (
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 
 
@@ -73,9 +75,36 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'gunicorn',
-    'events'
-]
+    'events',
+    #'events.get_domain',
+    'spiders',
+    #'django_celery_beat',
+    #'django_celery_results',
+    'django_mysql',
 
+]
+#INSTALLED_APPS += ['clever_cache']
+
+# clever_cache
+# CACHES = {
+#     "default": {
+#         "BACKEND": 'clever_cache.backend.RedisCache',
+#         "LOCATION": 'redis://127.0.0.1:6379/3',
+#         "OPTIONS": {
+#             'DB': 3,
+#         }
+#     }
+# }
+
+# Memcached
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+
+DJANGO_MYSQL_REWRITE_QUERIES = True
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     "django.contrib.auth.context_processors.auth",
@@ -90,6 +119,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 MIDDLEWARE_CLASSES = (
     # Simplified static file serving.
     # https://warehouse.python.org/project/whitenoise/
+    'django.middleware.cache.UpdateCacheMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -98,6 +128,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',
 )
 
 
@@ -108,7 +139,8 @@ LOGIN_URL = '/admin/login/'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'),
+                 os.path.join(BASE_DIR, 'spiders/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -137,6 +169,10 @@ DATABASES = {
         'PASSWORD': 'YQAy4&NwYBS2',
         'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
         'PORT': '5432',
+        'OPTIONS': {
+            # Tell MySQLdb to connect with 'utf8mb4' character set
+            'charset': 'utf8mb4',
+        },
     },
 }
 
@@ -223,3 +259,184 @@ LOGGING = {
 # STATICFILES_DIRS = (
 #     os.path.join(BASE_DIR, 'static'),
 # )
+
+# Other Django configurations...
+
+
+###############################################################################
+###############################################################################
+
+"""
+CELERY
+======
+
+# Celery application definition
+# http://docs.celeryproject.org/en/v4.0.2/userguide/configuration.html
+
+"""
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
+#CELERY_RESULT_BACKEND = 'django-db'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'Europe/Kiev'
+
+
+
+
+
+CELERY_IMPORTS = [
+    'spiders.tasks',
+    'events.tasks',
+    #'spiders.'
+    # 'spiders.caribbean.tasks',
+    # 'spiders.parter.tasks',
+]
+
+# import spiders.caribbean
+# import spiders.parter
+import sys
+sys.path.insert(0, "../event_placement")
+#from spiders.caribbean import *
+#from spiders.parter import *
+#from spiders import *
+from spiders.tasks import task_caribbean_parse, task_parsed_to_db, task_parter_parse
+from kombu import Exchange, Queue
+CELERY_TASK_QUEUES = (
+    Queue('mainchain', Exchange('mainchain'), routing_key='mainchain'),
+    Queue('todb', Exchange('todb'), routing_key='todb'),
+    Queue('high', Exchange('high'), routing_key='high'),
+    Queue('normal', Exchange('normal'), routing_key='normal'),
+    Queue('page_load', Exchange('page_load'), routing_key='page_load'),
+)
+
+# QUEUES="mainchain,high,todb,normal,low"
+# celery multi start worker -A project.foo -Q "$QUEUES" -l debug --concurrency=1 --prefetch-multiplier=1 -Ofair -D --logfile=celery.log
+
+# celery multi stop worker1 worker2 worker3 -A event_placement -l DEBUG -Q:worker1 mainchain -Q:worker2 todb -Q:worker3 high -Ofair -D --logfile=celery.log
+
+CELERY_DEFAULT_QUEUE = 'normal'
+CELERY_DEFAULT_EXCHANGE = 'normal'
+CELERY_DEFAULT_ROUTING_KEY = 'normal'
+
+
+CELERY_ROUTES = {
+    # -- HIGH PRIORITY QUEUE -- #
+
+    'spiders.tasks.task_caribbean_parse': {'queue': 'high'},
+    'spiders.tasks.task_parter_parse': {'queue': 'normal'},
+    'spiders.tasks.fb_chain': {'queue': 'mainchain'},
+    'spiders.tasks.task_facebook_parse_fc': {'queue': 'normal'},
+    'spiders.tasks.task_facebook_parse_fs': {'queue': 'normal'},
+    'spiders.tasks.task_facebook_parse_fj': {'queue': 'normal'},
+    'spiders.tasks.task_facebook_parse_fh': {'queue': 'normal'},
+    'spiders.tasks.task_facebook_parse_all': {'queue': 'normal'},
+
+    'spiders.tasks.task_parsed_to_db': {'queue': 'todb'},
+
+    # 'spiders.tasks.task_test_one': {'queue': 'high'},
+    #'spiders.tasks.task_caribbean_parse': {'queue': 'high'},
+    # -- NORMAL PRIORITY QUEUE   -- #
+    # 'spiders.tasks.task_test_two': {'queue': 'normal'},
+    # -- LOW PRIORITY QUEUE -- #
+    # 'spiders.tasks.task_test_three': {'queue': 'low'},
+}
+
+
+# tasl_sh
+# celery -A event_placement worker -E -l INFO -n worker.high -Q high --beat
+# celery -A event_placement worker -E -l INFO -n worker.normal -Q normal --beat
+# celery -A event_placement worker -E -l INFO -n worker.low -Q low --beat
+CELERY_SEND_TASK_SENT_EVENT = True
+CELERYBEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
+CELERY_ENABLE_UTC = False
+CELERY_MAX_TASKS_PER_CHILD=2
+# django_celery_beat
+
+# celery -A event_placement worker -E -l INFO -n worker.mainchain -Q mainchain
+# celery -A event_placement worker -E -l INFO -n worker.todb -Q todb
+# celery -A event_placement worker -E -l INFO -n worker.high -Q high
+# celery -A event_placement worker -E -l INFO -n worker.normal -Q normal
+# celery -A event_placement worker -E -l INFO -n worker.low -Q low
+
+# celery -A event_placement beat -l debug -S django
+
+
+# celery flower -A event_placement --address=127.0.0.1 --port=5555 -E -l INFO -n worker.high -Q high --beat
+# flower -A event_placement --address=127.0.0.1 --port=5555 --beat
+
+
+# celery -A event_placement worker -l info
+# celery -A event_placement beat -l info -n worker.high -Q high
+# celery -A event_placement worker -E -l INFO -n worker.high -Q high
+
+
+# The following lines may contains pseudo-code
+from celery.schedules import crontab
+# Other Celery settings
+CELERY_BEAT_SCHEDULE = {
+
+    # 'task-main_chain': {
+    #     'task': 'spiders.tasks.main_chain',
+    #     'schedule': 60.0, # crontab(minute='*/15'),  # 5.0,
+    #     'options': {'queue': 'mainchain'},
+    #     'args': ()
+    # },
+    # TESTS
+    # 'task-chain-chord-test': {
+    #     'task': 'spiders.tasks.chain_chord_test',
+    #     'schedule': 60.0, # crontab(minute='*/15'),  # 5.0,
+    #     'options': {'queue': 'mainchain'},
+    #     'args': ()
+    # },
+    # 'task-number-one': {
+    #     'task': 'spiders.tasks.task_test_one',
+    #     'schedule': 5.0,  # crontab(),
+    #     'options': {'queue': 'high'},
+    #     'args': ()
+    # },
+    # 'add-every-10-seconds': {
+    #         'task': 'spiders.tasks.task_test_two',
+    #         'schedule': 10.0,
+    #         'options': {'queue': 'normal'},
+    #         'args': ()
+    # },
+    # 'add-every-20-seconds': {
+    #         'task': 'spiders.tasks.task_test_three',
+    #         'schedule': 20.0,
+    #         'options': {'queue': 'low'},
+    #         'args': ()
+    # },
+    # 'task-number-one': {
+    #     'task': 'spiders.caribbean.tasks.task_number_one',
+    #     'schedule': 5.0,#crontab(),
+    #     'args': ()
+    # },
+    # 'add-every-10-seconds': {
+    #         'task': 'spiders.caribbean.tasks.task_number_one_two',
+    #         'schedule': 10.0,
+    #         'args': ()
+    # },
+    # 'add-every-20-seconds': {
+    #         'task': 'spiders.caribbean.tasks.task_number_one_three',
+    #         'schedule': 20.0,
+    #         'args': ()
+    # },
+    # 'task-number-two': {
+    #     'task': 'spiders.parter.tasks.task_number_two',
+    #     'schedule': 5.0,#crontab(),
+    #     'args': (3, 4)
+    # },
+    # 'add-every-30-seconds': {
+    #         'task': 'spiders.parter.tasks.task_number_one_two',
+    #         'schedule': 10.0,
+    #         'args': (16, 16)
+    # },
+    # 'add-every-40-seconds': {
+    #         'task': 'spiders.parter.tasks.task_number_three',
+    #         'schedule': 20.0,
+    #         'args': (16, 16)
+    # },
+}

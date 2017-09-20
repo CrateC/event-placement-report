@@ -1,12 +1,61 @@
 import datetime
-
+from django_mysql.models import QuerySet
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import connection
 from django.views.generic import ListView
-from utils.query_to_dict import convert_query_to_dict, convert_sqlite_query_to_dict
+# from django.db.models import CharField, Case, Value, When, F, Q, IntegerField
+try:
+    from utils.query_to_dict import convert_query_to_dict, convert_qslist_to_dict
+except:
+    from utils.query_to_dict import convert_sqlite_query_to_dict
+from .get_view_data import get_queryset_data
+from .tasks import get_query
+from .models import Event, Platform
+from django.http import HttpResponse
+from .queries import SELECT_ID, DROP_TABLE
+from .queries import MYSQL_CREATE_TEMP, MYSQL_LEFT_JOIN
+from .queries import SQLITE3_CREATE_TEMP, SQLITE3_LEFT_JOIN
 
-from .models import Event
-from django.db import connection
+
+from django.shortcuts import render
+from celery.result import AsyncResult
+from django.core.cache import cache
+
+
+class EventsPlacemenOrmView(LoginRequiredMixin, ListView):
+    template_name = 'events/export.html'
+
+    def get_queryset(self):
+
+        cache_key = 'Nlfjhdfyy!&pYEFmkFZN13451' # needs to be unique
+        cache_time = 86400 # time in seconds for cache to be valid
+        task_result = cache.get('task_result')
+        if not task_result:
+            task_result = get_query.delay().get()
+            cache.set(cache_key, task_result, cache_time)
+            # cache.set(
+            #         'task_result',
+            #         task_result,
+            #         depends_on=[Event]
+            # )
+        return (task_result)
+
+
+    # def get_queryset(self):
+    #     task_result = cache.get('task_result')
+    #     if not task_result:
+    #         task_result = get_query.delay().get()
+    #         cache.set(
+    #                 'task_result',
+    #                 task_result,
+    #                 depends_on=[Event]
+    #         )
+    #     return task_result
+        # task_result = get_query.delay().get()
+        #
+        # # if you need to use the task_id somewhere else
+        # # async_result = AsyncResult(id=task_result.id)
+        # return task_result
 
 
 class EventsPlacementListView(LoginRequiredMixin, ListView):
@@ -14,6 +63,8 @@ class EventsPlacementListView(LoginRequiredMixin, ListView):
     # login_url = '/au/login/'
     template_name = 'events/export.html'
     db_name = connection.settings_dict['NAME']
+    tbl_names = ['CA', 'PA', 'CO', 'KA']
+    #['ca', 'pa', 'ka', 'co']
 
     @staticmethod
     def count_events(pl_id_):
@@ -26,128 +77,60 @@ class EventsPlacementListView(LoginRequiredMixin, ListView):
 
     # @staff_member_required
     def get_queryset(self):
-
+        """ SELECT_ID, DROP_TABLE
+        """
         cursor = connection.cursor()
         columns = ['date', 'name']
-        tbl_names = ['ca', 'pa', 'ka', 'co']
         dc = {}
 
-        if connection.vendor == 'sqlite3':
-            for tbl_name_ in tbl_names:
+        for i, tbl_name in enumerate(self.tbl_names):
+            # print("")
+            # print("")
+            # print(f"tbl_name: {tbl_name}")
+            # print("")
+            # print("")
+            # print(f"SELECT_ID: {SELECT_ID.format(tbl_name)}")
+            # print("")
+            cursor.execute(SELECT_ID.format(tbl_name))
+            pl_id = cursor.fetchone()[0]
 
-                cursor.execute(
-                    """
-                        SELECT id FROM events_platforms
-                        WHERE short_name='{}';
-                    """.format(tbl_name_.upper())
-                )
-                pl_id = cursor.fetchone()[0]
+            if tbl_name in self.tbl_names:
+                dc["{}".format(tbl_name)] = self.count_events(pl_id)
 
-                if tbl_name_.upper() in ['CA', 'CO', 'KA', 'PA']:
-                    dc["{}".format(tbl_name_.upper())] = self.count_events(pl_id)
+            cursor.execute(DROP_TABLE.format(tbl_name))
+            #print(DROP_TABLE.format(tbl_name))
 
-                cursor.execute(
-                    """
-                        DROP TABLE IF EXISTS {}
-                    """.format(tbl_name_.upper()))
-
-                cursor.execute(
-                    """
-                        CREATE TEMP TABLE IF NOT EXISTS {} AS SELECT name,(link) as {}, date
-                        FROM {events_events}
-                        WHERE platform_id = (SELECT id FROM events_platforms
-                        WHERE short_name='{}') AND language = 'ru'
-                                            GROUP BY date order by date
-                    """.format(
-                        tbl_name_.upper(),
-                        tbl_name_.upper(),
-                        tbl_name_.upper())
-                    )
-
-                columns.append(tbl_name_.upper())
-
-            cursor.execute(
+            if connection.vendor == 'mysql':
+                """ MYSQL_CREATE_TEMP, MYSQL_LEFT_JOIN
                 """
-                    SELECT
-                    t1.date, t1.name, t1.CA,
-                    t2.PA,
-                    t4.CO,
-                    t3.KA
 
-                    FROM temp.CA AS t1
+                # print(f"{MYSQL_CREATE_TEMP.format(tbl_name)}")
+                cursor.execute(f"{MYSQL_CREATE_TEMP.format(tbl_name)}")
+                columns.append(tbl_name)
 
-                    LEFT JOIN temp.PA AS t2 ON t1.date = t2.date
+                if i == len(self.tbl_names)-1:
+                    # print(f"dc : {dc}")
+                    # print(f"MYSQL_LEFT_JOIN: {MYSQL_LEFT_JOIN}")
+                    cursor.execute(MYSQL_LEFT_JOIN)
+                    events_data = cursor.fetchall()
+                    # print(type(events_data))
+                    cursor.close()
+                    #return convert_query_to_dict("""{}""".format(events_data,))
 
-                    LEFT JOIN temp.KA AS t3 ON t1.date = t3.date
 
-                    LEFT JOIN temp.CO AS t4 ON t1.date = t4.date
-
-                    WHERE t1.date > datetime('NOW')
-                    ORDER BY t1.date;
-                """)
-
-            events_data = cursor.fetchall()
-            cursor.close()
-
-            return convert_sqlite_query_to_dict("""%s""" % events_data)
-
-        elif connection.vendor == 'mysql':
-            for tbl_name_ in tbl_names:
-
-                cursor.execute(
-                    """
-                        SELECT id FROM events_platforms
-                        WHERE short_name='{}';
-                    """.format(tbl_name_.upper())
-                )
-                pl_id = cursor.fetchone()[0]
-                #print(f"---------PL_ID: {pl_id}")
-
-                if tbl_name_.upper() in ['CA', 'CO', 'KA', 'PA']:
-                    dc["{}".format(tbl_name_.upper())] = self.count_events(pl_id)
-
-                cursor.execute(
-                    """
-                        DROP TABLE IF EXISTS {}
-                    """.format(tbl_name_.upper()))
-
-                cursor.execute(
-                    """
-                        CREATE TEMPORARY TABLE IF NOT EXISTS {0} AS (
-                            SELECT name,(link) as {0}, date
-                            FROM events_events
-                            WHERE platform_id = (SELECT id FROM events_platforms
-                        WHERE short_name='{0}') AND language = 'ru'
-                        GROUP BY date ORDER BY date
-                        );
-                    """.format(
-                        tbl_name_.upper(),
-                    )
-                )
-
-                columns.append(tbl_name_.upper())
-
-            cursor.execute(
+            elif connection.vendor == 'sqlite3':
+                """ SQLITE3_CREATE_TEMP, SQLITE3_LEFT_JOIN
                 """
-                    SELECT
-                    t1.date,t1.name,t1.CA,
-                    t2.PA,
-                    t4.CO,
-                    t3.KA
+                #for tbl_name in self.tbl_names:
 
-                    FROM CA AS t1
+                cursor.execute(SQLITE3_CREATE_TEMP.format(tbl_name))
+                columns.append(tbl_name)
+                #continue
 
-                        LEFT JOIN PA AS t2 ON t1.date = t2.date
+                if tbl_name in max(self.tbl_names):
+                    cursor.execute(SQLITE3_LEFT_JOIN)
+                    events_data = cursor.fetchall()
+                    cursor.close()
+                    #return convert_sqlite_query_to_dict("""%s""" % events_data)
 
-                        LEFT JOIN KA AS t3 ON t1.date = t3.date
-
-                        LEFT JOIN CO AS t4 ON t1.date = t4.date
-
-                    WHERE t1.date > CURDATE()
-                    ORDER BY date
-                """)
-
-            events_data = cursor.fetchall()
-            print(type(events_data))
-            cursor.close()
-            return convert_query_to_dict("""{}""".format(events_data,))
+        return convert_query_to_dict("""{}""".format(events_data,))
