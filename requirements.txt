@@ -7,7 +7,7 @@ celery==4.0.2
 certifi==2017.7.27.1
 chardet==3.0.4
 dj-database-url==0.4.2
-Django==1.11.4
+Django==2.2.24
 django-celery-beat==1.0.1
 django-crispy-forms==1.6.1
 django-mysql==2.1.0
